@@ -1,4 +1,4 @@
-(load "code1.scm")
+(load "framework.scm")
 
 (define bar
   (label 'private 'bar
