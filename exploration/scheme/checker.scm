@@ -663,21 +663,6 @@
 
 ;;;;;;;;
 
-;;; Additional tests
-(time 42)
-(quote asd)
-'(asd)
-(case (* 2 3)
-  ((2 3 5 7) 'prime)
-  ((1 4 6 8 9) 'composite)) 
-(case (car '(c d))
-  ((a) 'a)
-  ((b) 'b))                
-(case (car '(c d))
-  ((a e i o u) 'vowel)
-  ((w y) 'semivowel)
-  (else 'consonant))
-
 ;;; end of week-4_a-syntax-checker-for-Scheme.scm
 
 "week-4_a-syntax-checker-for-Scheme.scm"
