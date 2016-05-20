@@ -60,7 +60,7 @@
 ;;;;;;;;;;
 
 (define check-program
-  (trace-lambda check-program (v pc env)
+  (lambda (v pc env)
     (cond
       [(null? v)
        env]
@@ -82,7 +82,8 @@
       [(is-definition? v)
        (check-definition (define-1 v) (define-2 v) pc env)]
       [else
-       (check-expression v pc)])))
+       (check-expression v pc env)
+       env])))
 
 ;;;;;;;;;;
 
@@ -121,9 +122,9 @@
 ;;;;;;;;;;
 
 (define check-definition
-  (trace-lambda check-definition (name definiens pc env)
-    (let ([label (check-expression definiens pc)])
-      (alist-extend name (eval label) env))))
+  (lambda (name definiens pc env)
+    (let ([label (check-expression definiens pc env)])
+      (alist-extend name label env))))
 
 ;;;;;;;;;;
 
@@ -386,54 +387,54 @@
 ;;;;;;;;;;
 
 (define check-expression
-  (lambda (v pc)
+  (lambda (v pc env)
     (cond
       [(is-number? v)
-       (check-number v pc)]
+       (check-number v pc env)]
       [(is-boolean? v)
-       (check-boolean v pc)]
+       (check-boolean v pc env)]
       [(is-character? v)
-       (check-character v pc)]
+       (check-character v pc env)]
       [(is-string? v)
-       (check-string v pc)]
+       (check-string v pc env)]
       [(is-variable? v)
-       (check-variable v pc)]
+       (check-variable v pc env)]
 
       ;;; IFC
       [(is-label? v)
-       (check-label-expression (label-1 v) (label-2 v) pc)]
+       (check-label-expression (label-1 v) (label-2 v) pc env)]
       ;;;
       
       [(is-time? v)
-       (check-time-expression (time-1 v) pc)]
+       (check-time-expression (time-1 v) pc env)]
       [(is-if? v)
-       (check-if-expression (if-1 v) (if-2 v) (if-3 v) pc)]
+       (check-if-expression (if-1 v) (if-2 v) (if-3 v) pc env)]
       [(is-and? v)
-       (check-and-expression (cdr v) pc)]
+       (check-and-expression (cdr v) pc env)]
       [(is-or? v)
-       (check-or-expression (cdr v) pc)]
+       (check-or-expression (cdr v) pc env)]
       [(is-cond? v)
-       (check-cond-expression (cdr v) pc)]
+       (check-cond-expression (cdr v) pc env)]
       [(is-case? v)
-       (check-case-expression (cdr v) pc)]
+       (check-case-expression (cdr v) pc env)]
       [(is-let? v)
-       (check-let-expression (let-1 v) (let-2 v) pc)]
+       (check-let-expression (let-1 v) (let-2 v) pc env)]
       [(is-letstar? v)
-       (check-let-expression (letstar-1 v) (letstar-2 v) pc)]
+       (check-let-expression (letstar-1 v) (letstar-2 v) pc env)]
       [(is-letrec? v)
-       (check-letrec-expression (letrec-1 v) (letrec-2 v) pc)]
+       (check-letrec-expression (letrec-1 v) (letrec-2 v) pc env)]
       [(is-begin? v)
-       (check-expressions (cdr v) pc)]
+       (check-expressions (cdr v) pc env)]
       [(is-unless? v)
-       (check-unless-expression (unless-1 v) (unless-2 v) pc)]
+       (check-unless-expression (unless-1 v) (unless-2 v) pc env)]
       [(is-quote? v)
-       (check-quote-expression (quote-1 v) pc)]
+       (check-quote-expression (quote-1 v) pc env)]
       [(is-lambda? v)
-       (check-lambda (lambda-1 v) (lambda-2 v) pc)]
+       (check-lambda (lambda-1 v) (lambda-2 v) pc env)]
       [(is-trace-lambda? v)
-       (check-trace-lambda (trace-lambda-1 v) (trace-lambda-2 v) (trace-lambda-3 v) pc)]
+       (check-trace-lambda (trace-lambda-1 v) (trace-lambda-2 v) (trace-lambda-3 v) pc env)]
       [(is-application? v)
-       (check-application (application-operator v) (application-operands v) pc)]
+       (check-application (application-operator v) (application-operands v) pc env)]
       [else
        (begin
          (unless check-silently
@@ -441,198 +442,205 @@
          #f)])))
 
 (define check-expressions
-  (lambda (v pc)
+  (lambda (v pc env)
     (cond
      [(null? v)
       pc]
      [(pair? v)
-      (and (check-expression (car v) pc)
-	   (check-expressions (cdr v) pc))])))
+      (and (check-expression (car v) pc env)
+	   (check-expressions (cdr v) pc env))])))
 
 (define check-number
-  (lambda (n pc)
+  (lambda (n pc env)
     pc))
 
 (define check-boolean
-  (lambda (b pc)
+  (lambda (b pc env)
     pc))
 
 (define check-character
-  (lambda (c pc)
+  (lambda (c pc env)
     pc))
 
 (define check-string
-  (lambda (s pc)
+  (lambda (s pc env)
     pc))
 
 (define check-variable
-  (lambda (v pc)
-    pc))
+  (lambda (v pc env)
+    (alist-lookup
+     v
+     env
+     (lambda(label)
+       (if (compare-labels v pc)
+	   pc
+	   (errorf "Mismatched pc ~s for ~s with label ~s~n" pc v label)))
+     (lambda(v) pc))))
 
 (define check-variable*
-  (lambda (v pc)
+  (lambda (v pc env)
     (cond
      [(null? v)
       pc]
      [(pair? v)
-      (check-variable (car v) pc)
-      (check-variable* (cdr v) pc)]
+      (check-variable (car v) pc env)
+      (check-variable* (cdr v) pc env)]
      [else
-      (check-variable v pc)])))
+      (check-variable v pc env)])))
 
 ;;; IFC
 
 (define check-label-expression
-  (trace-lambda check-label (label expression pc)
-    (if (compare-labels label pc)
-	(check-expression expression label)
-	(errorf "Mismatched labels ~n -> ~n" label pc))))
+  (lambda (label expression pc env)
+    (if (compare-labels (eval label) pc)
+	(check-expression expression (eval label) env)
+	(errorf "Mismatched labels ~n -> ~n" (eval label) pc))))
 
 ;;;
 
 (define check-time-expression
-  (lambda (v pc)
-    (check-expression v pc)))
+  (lambda (v pc env)
+    (check-expression v pc env)))
 
 (define check-if-expression
-  (lambda (test consequent alternative pc)
-    (and (check-expression test pc)
-         (check-expression consequent pc)
-         (check-expression alternative pc))))
+  (lambda (test consequent alternative pc env)
+    (and (check-expression test pc env)
+         (check-expression consequent pc env)
+         (check-expression alternative pc env))))
 
 (define check-and-expression
-  (lambda (v pc)
+  (lambda (v pc env)
     (cond
      [(null? v)
       pc]
      [(pair? v)
-      (and (check-expression (car v) pc)
-	   (check-and-expression (cdr v) pc))])))  
+      (and (check-expression (car v) pc env)
+	   (check-and-expression (cdr v) pc env))])))  
 
 (define check-or-expression
-  (lambda (v pc)
+  (lambda (v pc env)
     (cond
      [(null? v)
       pc]
      [(pair? v)
-      (and (check-expression (car v) pc)
-	   (check-or-expression (cdr v) pc))])))
+      (and (check-expression (car v) pc env)
+	   (check-or-expression (cdr v) pc env))])))
 
 (define check-cond-expression
-  (lambda (v pc)
-    (check-cond-clauses v pc)))
+  (lambda (v pc env)
+    (check-cond-clauses v pc env)))
 
 (define check-cond-clauses
-  (lambda (v pc)
+  (lambda (v pc env)
     (cond
      [(null? v)
       pc]
      [(is-else? (car v))
-      (check-expression (cdar v) pc)]
+      (check-expression (cdar v) pc env)]
      [(pair? v)
-      (and (check-cond-clause (car v) pc)
-	   (check-cond-clauses (cdr v) pc))])))
+      (and (check-cond-clause (car v) pc env)
+	   (check-cond-clauses (cdr v) pc env))])))
   
 
 (define check-cond-clause
-  (lambda (v pc)
+  (lambda (v pc env)
     (if (proper-list-of-given-length? v 1)
-	(check-expression v pc)
+	(check-expression v pc env)
 	(if (equal? (cadr v) '=>)
-	    (and (check-expression (cdr v) pc)
-		 (check-expression (caddr v) pc))
-	    (and (check-expression (car v) pc)
-		 (check-expression (cadr v) pc))))))
+	    (and (check-expression (cdr v) pc env)
+		 (check-expression (caddr v) pc env))
+	    (and (check-expression (car v) pc env)
+		 (check-expression (cadr v) pc env))))))
 
 (define check-case-expression
-  (lambda (v pc)
-    (and (check-expression (car v) pc)
-	 (check-case-clauses (cdr v) pc))))
+  (lambda (v pc env)
+    (and (check-expression (car v) pc env)
+	 (check-case-clauses (cdr v) pc env))))
 
 (define check-case-clauses
-  (lambda (v pc)
+  (lambda (v pc env)
     (cond
      [(null? v)
       pc]
      [(is-else? (car v))
-      (check-expression (cdar v) pc)]
+      (check-expression (cdar v) pc env)]
      [(pair? v)
-      (and (check-case-clause (car v) pc)
-	   (check-case-clauses (cdr v) pc))])))
+      (and (check-case-clause (car v) pc env)
+	   (check-case-clauses (cdr v) pc env))])))
 
 (define check-case-clause
-  (lambda (v pc)
-    (and (check-quotations (car v) pc)
-	 (check-expression (cdr v) pc))))
+  (lambda (v pc env)
+    (and (check-quotations (car v) pc env)
+	 (check-expression (cdr v) pc env))))
 
 (define check-let-expression
-  (lambda (bindings body pc)
-    (and (check-let-bindings bindings pc)
-	 (check-expression body pc))))
+  (lambda (bindings body pc env)
+    (and (check-let-bindings bindings pc env)
+	 (check-expression body pc env))))
 
 (define check-let-bindings
-  (lambda (v pc)
+  (lambda (v pc env)
     (cond
      [(null? v)
       pc]
      [(pair? v)
-      (check-let-binding (car v) pc)
-      (check-let-bindings (cdr v) pc)])))
+      (check-let-binding (car v) pc env)
+      (check-let-bindings (cdr v) pc env)])))
 
 (define check-let-binding
-  (lambda (v pc)
+  (lambda (v pc env)
     (and (pair? v)
-	 (check-variable (car v) pc)
-	 (check-expression (cdr v) pc))))
+	 (check-variable (car v) pc env)
+	 (check-expression (cdr v) pc env))))
 
 (define check-letrec-expression
-  (lambda (bindings body pc)
-    (and (check-letrec-bindings bindings pc)
-	 (check-expression body pc))))
+  (lambda (bindings body pc env)
+    (and (check-letrec-bindings bindings pc env)
+	 (check-expression body pc env))))
 
 (define check-letrec-bindings
-  (lambda (v pc)
+  (lambda (v pc env)
     (cond
      [(null? v)
       pc]
      [(pair? v)
-      (check-letrec-binding (car v) pc)
-      (check-letrec-bindings (cdr v) pc)])))
+      (check-letrec-binding (car v) pc env)
+      (check-letrec-bindings (cdr v) pc env)])))
 
 (define check-letrec-binding
-  (lambda (v pc)
+  (lambda (v pc env)
     (and (pair? v)
-	 (check-variable (car v) pc)
+	 (check-variable (car v) pc env)
 	 (cond
 	  [(is-lambda? (cdr v))
-	   (check-lambda (cdr v) pc)]
+	   (check-lambda (cdr v) pc env)]
 	  [(is-trace-lambda? (cdr v))
-	   (check-trace-lambda (cdr v) pc)]))))
+	   (check-trace-lambda (cdr v) pc env)]))))
 
 (define check-unless-expression
-  (lambda (test consequent pc)
-    (and (check-expression test pc)
-         (check-expression consequent pc))))
+  (lambda (test consequent pc env)
+    (and (check-expression test pc env)
+         (check-expression consequent pc env))))
 
 (define check-quote-expression
-  (lambda (v pc)
-    (check-quotation v pc)))
+  (lambda (v pc env)
+    (check-quotation v pc env)))
 
 (define check-quotations
-  (lambda (v pc)
+  (lambda (v pc env)
     (cond
      [(null? v)
       pc]
      [(pair? v)
-      (and (check-quotation (car v) pc)
-	   (check-quotations (cdr v) pc))])))
+      (and (check-quotation (car v) pc env)
+	   (check-quotations (cdr v) pc env))])))
 
 (define check-quotation
-  (lambda (v pc)
+  (lambda (v pc env)
     (cond
       [(pair? v)
-       (and (check-quotation (car v) pc)
-	    (check-quotation (cdr v) pc))]
+       (and (check-quotation (car v) pc env)
+	    (check-quotation (cdr v) pc env))]
       [(number? v)
        pc]
       [(boolean? v)
@@ -649,28 +657,28 @@
        #f])))
 
 (define check-lambda
-  (lambda (formals expression pc)
-    (and (check-lambda-formals formals pc)
-	 (check-expression expression pc))))
+  (lambda (formals expression pc env)
+    (and (check-lambda-formals formals pc env)
+	 (check-expression expression pc env))))
 
 (define check-trace-lambda
-  (lambda (name formals expression pc)
+  (lambda (name formals expression pc env)
     (and (symbol? name)
-	 (check-lambda-formals formals pc)
-	 (check-expression expression pc))))
+	 (check-lambda-formals formals pc env)
+	 (check-expression expression pc env))))
 
 (define check-lambda-formals
-  (lambda (v pc)
+  (lambda (v pc env)
     (cond
      [(is-variable? v)
-      (check-variable v pc)]
+      (check-variable v pc env)]
      [(list? v)
-      (check-variable* v pc)])))
+      (check-variable* v pc env)])))
 
 (define check-application
-  (lambda (v vs pc)
-    (and (check-expression v pc)
-	 (check-expressions vs pc))))
+  (lambda (v vs pc env)
+    (and (check-expression v pc env)
+	 (check-expressions vs pc env))))
 
 ;;;;;;;;;;
 ;;; auxiliaries:
