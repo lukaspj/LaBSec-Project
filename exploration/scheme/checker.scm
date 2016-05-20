@@ -480,11 +480,13 @@
 
 (define check-cond-clause
   (lambda (v)
-    (if (equal? (cadr v) '=>)
-	  (and (check-expression (cdr v))
-	       (check-expression (caddr v)))
-	  (and (check-expression (car v))
-	       (check-expression (cadr v))))))
+    (if (proper-list-of-given-length? v 1)
+	(check-expression v)
+	(if (equal? (cadr v) '=>)
+	    (and (check-expression (cdr v))
+		 (check-expression (caddr v)))
+	    (and (check-expression (car v))
+		 (check-expression (cadr v)))))))
 
 (define check-case-expression
   (lambda (v)
