@@ -592,26 +592,22 @@
 
 (define check-lambda
   (lambda (formals expression)
-    (and (is-lambda-formals? formals)
-	 (check-lambda-formals formals)
+    (and (check-lambda-formals formals)
 	 (check-expression expression))))
 
 (define check-trace-lambda
   (lambda (name formals expression)
     (and (symbol? name)
-	 (is-lambda-formals? formals)
 	 (check-lambda-formals formals)
 	 (check-expression expression))))
 
 (define check-lambda-formals
   (lambda (v)
-    (if (is-lambda-formals? v)
-	(cond
-	 [(is-variable? v)
-	  (check-variable v)]
-	 [(list? v)
-	  (check-variable* v)])
-	#f)))
+    (cond
+     [(is-variable? v)
+      (check-variable v)]
+     [(list? v)
+      (check-variable* v)])))
 
 (define check-application
   (lambda (v vs)
