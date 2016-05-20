@@ -1,5 +1,9 @@
+'Skip__IFC__Check
+
+(load "checker.scm")
+
 (define label
-  (lambda (label name val)
+  (lambda (label val)
     val))
 
 ;;; reads an entire file as a list of Scheme data
@@ -21,4 +25,4 @@
 
 (define verify
   (lambda (program)
-    (printf "Verified!~n")))
+    (check-program program 'bottom alist-mt)))
