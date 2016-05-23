@@ -140,7 +140,8 @@
        ;; (if (label-flows-to pc label)
        ;; 	   pc
        ;; 	   (errorf 'check-variable "Mismatched pc ~s for ~s with label ~s~n" pc v label)))
-     (lambda(v) pc))))
+     (lambda(v)
+       pc))))
 
 (define check-variable*
   (lambda (v pc env)
@@ -246,23 +247,30 @@
 
 (define check-let-expression
   (lambda (bindings body pc env)
-    (and (check-let-bindings bindings pc env)
-	 (check-expression body pc env))))
+    (let ([bindings-env (check-let-bindings bindings
+                                            pc
+                                            env)])
+      (check-expression body
+                        pc
+                        bindings-env))))
 
 (define check-let-bindings
   (lambda (v pc env)
     (cond
      [(null? v)
-      pc]
+      env]
      [(pair? v)
-      (check-let-binding (car v) pc env)
-      (check-let-bindings (cdr v) pc env)])))
+      (check-let-bindings (cdr v)
+                          pc
+                          (check-let-binding (car v)
+                                             pc
+                                             env))])))
 
 (define check-let-binding
   (lambda (v pc env)
-    (and (pair? v)
-	 (check-variable (car v) pc env)
-	 (check-expression (cdr v) pc env))))
+    (alist-extend (car v)
+                  (check-expression (cadr v) pc env)
+                  env)))
 
 (define check-letrec-expression
   (lambda (bindings body pc env)
