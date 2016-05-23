@@ -47,7 +47,6 @@
       [(null? v)
        env]
       [(pair? v)
-       (printf "~s~n" (car v))
        (if (equal? (car v) ''Skip__IFC__Check)
 	   env
 	   (check-program (cdr v)
