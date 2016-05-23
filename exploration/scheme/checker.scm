@@ -149,8 +149,8 @@
      [(null? v)
       pc]
      [(pair? v)
-      (and (check-expression (car v) pc env)
-	   (check-expressions (cdr v) pc env))])))
+      (begin (check-expression (car v) pc env)
+             (check-expressions (cdr v) pc env))])))
 
 
 (define check-variable
@@ -333,8 +333,9 @@
 
 (define check-unless-expression
   (lambda (test consequent pc env)
-    (and (check-expression test pc env)
-         (check-expression consequent pc env))))
+    (check-expression consequent
+                      (check-expression test pc env)
+                      env)))
 
 (define check-quote-expression
   (lambda (v pc env)
@@ -342,19 +343,15 @@
 
 (define check-quotations
   (lambda (v pc env)
-    (cond
-     [(null? v)
-      pc]
-     [(pair? v)
-      (and (check-quotation (car v) pc env)
-	   (check-quotations (cdr v) pc env))])))
-
+    pc))
+    
 (define check-quotation
   (lambda (v pc env)
     (cond
       [(pair? v)
-       (and (check-quotation (car v) pc env)
-	    (check-quotation (cdr v) pc env))]
+       pc]
+                                        ;(and (check-quotation (car v) pc env)
+                                        ;    (check-quotation (cdr v) pc env))]
       [(number? v)
        pc]
       [(boolean? v)
