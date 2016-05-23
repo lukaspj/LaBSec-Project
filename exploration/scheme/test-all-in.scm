@@ -5,7 +5,10 @@
     "negative-tests/test2.scm"
     "negative-tests/test3.scm"
     "negative-tests/test4.scm"
-    "negative-tests/test5.scm"))
+    "negative-tests/test5.scm"
+    "negative-tests/test6.scm"
+    "negative-tests/test7.scm"
+    "negative-tests/test8.scm"))
 
 (define try
   (lambda (thunk)

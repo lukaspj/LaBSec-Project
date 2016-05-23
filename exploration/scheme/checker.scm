@@ -215,17 +215,19 @@
      [(null? v)
       pc]
      [(pair? v)
-      (and (check-expression (car v) pc env)
-	   (check-and-expression (cdr v) pc env))])))  
+      (check-and-expression (cdr v)
+			    (check-expression (car v) pc env)
+			    env)])))  
 
 (define check-or-expression
-  (lambda (v pc env)
+  (trace-lambda check-or (v pc env)
     (cond
      [(null? v)
       pc]
      [(pair? v)
-      (and (check-expression (car v) pc env)
-	   (check-or-expression (cdr v) pc env))])))
+      (check-or-expression (cdr v)
+			   (check-expression (car v) pc env)
+			   env)])))
 
 (define check-cond-expression
   (lambda (v pc env)
@@ -239,8 +241,10 @@
      [(is-else? (car v))
       (check-expression (cdar v) pc env)]
      [(pair? v)
-      (and (check-cond-clause (car v) pc env)
-	   (check-cond-clauses (cdr v) pc env))])))
+      (check-cond-clauses
+       (cdr v)
+       (check-cond-clause (car v) pc env)
+       env)])))
   
 
 (define check-cond-clause
