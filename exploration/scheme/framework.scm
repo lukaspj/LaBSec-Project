@@ -6,6 +6,10 @@
   (lambda (label val)
     val))
 
+(define principals
+  (lambda p
+    p))
+
 ;;; reads an entire file as a list of Scheme data
 ;;; use: (read-file "filename.scm")
 (define read-file
