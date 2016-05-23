@@ -128,6 +128,14 @@
   (lambda (v)
     (list-ref v 2)))
 
+(define is-load?
+  (lambda (v)
+    (is-given-type? v 2 'load)))
+
+(define load-1
+  (lambda (v)
+    (list-ref v 1)))
+
 ;;;;;
 
 ;;; predicate:

@@ -20,15 +20,39 @@
 
 ;;;;;;;;;;
 
+;;; reads an entire file as a list of Scheme data
+;;; use: (read-file "filename.scm")
+(define read-file
+  (lambda (filename)
+    (call-with-input-file filename
+      (lambda (p)
+        (letrec ([visit (lambda ()
+                          (let ([in (read p)])
+                            (if (eof-object? in)
+                                '()
+                                (cons in (visit)))))])
+          (visit))))))
+
+;;;;;;;;;;
+
+(define check-file
+  (lambda (file pc env)
+    (check-program (read-file file) pc env)))
+
+;;;;;;;;;;
+
 (define check-program
   (lambda (v pc env)
     (cond
       [(null? v)
        env]
       [(pair? v)
-       (check-program (cdr v)
-		      pc
-		      (check-toplevel-form (car v) pc env))]
+       (printf "~s~n" (car v))
+       (if (equal? (car v) ''Skip__IFC__Check)
+	   env
+	   (check-program (cdr v)
+			  pc
+			  (check-toplevel-form (car v) pc env)))]
       [else
        (begin
          (unless check-silently
@@ -40,11 +64,13 @@
 (define check-toplevel-form
   (lambda (v pc env)
     (cond
-      [(is-definition? v)
-       (check-definition (define-1 v) (define-2 v) pc env)]
-      [else
-       (check-expression v pc env)
-       env])))
+     [(is-load? v)
+      (check-file (load-1 v) pc env)]
+     [(is-definition? v)
+      (check-definition (define-1 v) (define-2 v) pc env)]
+     [else
+      (begin (check-expression v pc env)
+	     env)])))
 
 ;;;;;;;;;;
 
