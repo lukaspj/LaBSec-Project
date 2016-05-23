@@ -274,27 +274,32 @@
 
 (define check-letrec-expression
   (lambda (bindings body pc env)
-    (and (check-letrec-bindings bindings pc env)
-	 (check-expression body pc env))))
+    (check-expression body
+                      pc
+                      (check-letrec-bindings bindings
+                                             pc
+                                             env))))
 
 (define check-letrec-bindings
   (lambda (v pc env)
     (cond
      [(null? v)
-      pc]
+      env]
      [(pair? v)
-      (check-letrec-binding (car v) pc env)
-      (check-letrec-bindings (cdr v) pc env)])))
+      (check-letrec-bindings (cdr v)
+                             pc
+                             (check-letrec-binding (car v)
+                                                   pc
+                                                   env))])))
 
 (define check-letrec-binding
   (lambda (v pc env)
     (and (pair? v)
-	 (check-variable (car v) pc env)
-	 (cond
-	  [(is-lambda? (cdr v))
-	   (check-lambda (cdr v) pc env)]
-	  [(is-trace-lambda? (cdr v))
-	   (check-trace-lambda (cdr v) pc env)]))))
+	 (check-expression (cdr v)
+                           pc
+                           (check-variable (car v)
+                                           pc
+                                           env)))))
 
 (define check-unless-expression
   (lambda (test consequent pc env)
