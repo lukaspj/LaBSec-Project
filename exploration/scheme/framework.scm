@@ -26,3 +26,22 @@
 (define verify
   (lambda (program)
     (check-program program 'bottom alist-mt)))
+
+
+
+
+
+
+;;; label bnf proposal
+;;; 
+;;; labal     ::= ('label readers* writters*)
+;;; 
+;;; readers   ::= ('readers principal (principal*))
+;;; 
+;;; writters  ::= ('writters principal (principal*))
+;;; 
+;;; principal ::= 'buttom
+;;;             | 'top
+;;;             | <some defined symbol>
+
+
