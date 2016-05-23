@@ -11,9 +11,12 @@
 ;      #t)))
 
 
+(define bot-inte)
+(define bot-conf)
+
 ;;; Centralized-One-dimensional label model
 (define check-integrity-flows-to
-  (trace-lambda integrity-flows-to (l1 l2)
+  (lambda (l1 l2)
     (let ([integrity1 (cadr l1)]
 	  [integrity2 (cadr l2)])
       (if (null? integrity1)
@@ -22,7 +25,7 @@
 	       (>= (cdr integrity1) (cdr integrity2)))))))
 
 (define check-confidentiality-flows-to
-  (trace-lambda confidentiality-flows-to (l1 l2)
+  (lambda (l1 l2)
     (let ([confidentiality1 (caddr l1)]
 	  [confidentiality2 (caddr l2)])
       (if (null? confidentiality1)
