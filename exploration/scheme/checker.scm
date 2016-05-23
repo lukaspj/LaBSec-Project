@@ -319,12 +319,9 @@
 
 (define check-letrec-binding
   (lambda (v pc env)
-    (and (pair? v)
-	 (check-expression (cdr v)
-                           pc
-                           (check-variable (car v)
-                                           pc
-                                           env)))))
+    (alist-extend (car v)
+                  (check-expression (cadr v) pc env)
+                  env)))
 
 (define check-unless-expression
   (lambda (test consequent pc env)
