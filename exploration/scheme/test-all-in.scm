@@ -1,7 +1,10 @@
 (load "framework.scm")
 
 (define negative-tests
-  '("negative-tests/test1.scm" "negative-tests/test2.scm"))
+  '("negative-tests/test1.scm"
+    "negative-tests/test2.scm"
+    "negative-tests/test3.scm"
+    "negative-tests/test4.scm"))
 
 (define (try thunk)
   (call/cc
@@ -22,4 +25,3 @@
 	    (printf "No error in ~s~n" (car tests))
 	    (and (not current)
 		 rest)))])))
-
