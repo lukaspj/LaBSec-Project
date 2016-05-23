@@ -109,8 +109,6 @@
        (check-label-expression (label-1 v) (label-2 v) pc env)]
       ;;;
       
-      [(is-time? v)
-       (check-time-expression (time-1 v) pc env)]
       [(is-if? v)
        (check-if-expression (if-1 v) (if-2 v) (if-3 v) pc env)]
       [(is-and? v)
@@ -191,10 +189,6 @@
 		  expression)))))
 
 ;;;
-
-(define check-time-expression
-  (lambda (v pc env)
-    (check-expression v pc env)))
 
 (define check-if-expression
   (lambda (test consequent alternative pc env)

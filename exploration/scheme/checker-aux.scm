@@ -139,18 +139,6 @@
 ;;;;;
 
 ;;; predicate:
-(define is-time?
-  (lambda (v)
-    (is-given-type? v 2 'time)))
-
-;;; 1st accessor:
-(define time-1
-  (lambda (v)
-    (list-ref v 1)))
-
-;;;;;
-
-;;; predicate:
 (define is-if?
   (lambda (v)
     (is-given-type? v 4 'if)))
@@ -361,7 +349,7 @@
 ;;;;;;;;;;
 
 (define keywords
-  (list 'define 'time 'if 'cond 'else 'case 'and 'or 'let 'let* 'letrec
+  (list 'define 'if 'cond 'else 'case 'and 'or 'let 'let* 'letrec
         'begin 'quote 'quasiquote 'unquote 'unquote-splicing 'lambda 'trace-lambda))
 
 (define keyword?
