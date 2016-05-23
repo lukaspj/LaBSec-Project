@@ -245,16 +245,15 @@
   (lambda (v pc env)
     (if (proper-list-of-given-length? v 1)
 	(check-expression v pc env)
-	(if (equal? (cadr v) '=>)
-	    (and (check-expression (cdr v) pc env)
-		 (check-expression (caddr v) pc env))
-	    (and (check-expression (car v) pc env)
-		 (check-expression (cadr v) pc env))))))
+        (check-expression (cadr v)
+                          (check-expression (car v) pc env)
+                          env))))
 
 (define check-case-expression
   (lambda (v pc env)
-    (and (check-expression (car v) pc env)
-	 (check-case-clauses (cdr v) pc env))))
+    (check-case-clauses (cdr v)
+                        (check-expression (car v) pc env)
+                        env)))
 
 (define check-case-clauses
   (lambda (v pc env)
@@ -264,13 +263,14 @@
      [(is-else? (car v))
       (check-expression (cdar v) pc env)]
      [(pair? v)
-      (and (check-case-clause (car v) pc env)
-	   (check-case-clauses (cdr v) pc env))])))
+      (check-case-clauses (cdr v)
+                          (check-case-clause (car v) pc env)
+                          env)])))
 
 (define check-case-clause
   (lambda (v pc env)
-    (and (check-quotations (car v) pc env)
-	 (check-expression (cdr v) pc env))))
+    ;(check-quotations (car v) pc env)
+    (check-expression (cdr v) pc env)))
 
 (define check-let-expression
   (lambda (bindings body pc env)
