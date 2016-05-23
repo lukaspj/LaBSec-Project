@@ -1,4 +1,4 @@
-(load "./../framework.scm")
+(load "framework.scm")
 
 (define foo
   (label-expression '(label (integrity . 0) (confidentiality . 0))
