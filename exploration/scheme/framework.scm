@@ -2,9 +2,9 @@
 
 (load "checker.scm")
 
-(define label
-  (lambda (label val)
-    val))
+(define label-expression
+  (lambda (label expr)
+    expr))
 
 (define principals
   (lambda p
@@ -29,7 +29,7 @@
 
 (define verify
   (lambda (program)
-    (check-program program 'bottom alist-mt)))
+    (check-program program '(label () ()) alist-mt)))
 
 
 
@@ -38,7 +38,7 @@
 
 ;;; label bnf proposal
 ;;; 
-;;; label     ::= ('label readers* writers*)
+;;; label     ::= ('label (readers*) (writers*) expression)
 ;;; 
 ;;; readers   ::= ('readers principal (principal*))
 ;;; 

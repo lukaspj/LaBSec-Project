@@ -118,7 +118,7 @@
 
 (define is-label?
   (lambda (v)
-    (is-given-type? v 3 'label)))
+    (is-given-type? v 3 'label-expression)))
 
 (define label-1
   (lambda (v)
