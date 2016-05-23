@@ -33,6 +33,33 @@
 	  (or (null? confidentiality2)
 	      (<= (cdr confidentiality1) (cdr confidentiality2)))))))
 
+(define join-integrity
+  (lambda (l1 l2)
+    (let ([integrity1 (cadr l1)]
+	  [integrity2 (cadr l2)])
+      (if (null? integrity1)
+	  (if (null? integrity2)
+	      '()
+	      integrity2)
+	  (if (null? integrity2)
+	      integrity1
+	      (cons 'integrity
+		    (min (cdr integrity1) (cdr integrity2))))))))
+  
+(define join-confidentiality
+  (lambda (l1 l2)
+	  (let ([confidentiality1 (caddr l1)]
+		[confidentiality2 (caddr l2)])
+	    (if (or (null? confidentiality1)
+		    (null? confidentiality2))
+		'()
+		(cons 'confidentiality
+		      (max (cdr confidentiality1) (cdr confidentiality2)))))))
+  
+(define label-join
+  (lambda (l1 l2)
+    `(label ,(join-integrity l1 l2) ,(join-confidentiality l1 l2))))
+
 (define label-flows-to
   (lambda (l1 l2)
     (and (check-integrity-flows-to l1 l2)
@@ -107,3 +134,19 @@
 
        (test-flows-to-equal 'twotop 'onetop #t)
        (test-flows-to-equal 'toptwo 'topone #f)))
+
+(define test-join-equal
+  (lambda (p1 p2 expected)
+    (let ([result (label-join (eval p1) (eval p2))])
+      (if (equal? result (eval expected))
+	  #t
+	  (errorf
+	   'test-join-equal
+	   "~s join ~s was expected to be ~s but was ~s ~n"
+	   p1 p2 expected result)))))
+  
+(define test-join
+  (and (test-join-equal 'toptop 'botbot 'bottop)
+       (test-join-equal 'botbot 'toptop 'bottop)
+       (test-join-equal 'topbot 'toptop 'toptop)
+       (test-join-equal 'topbot 'topbot 'topbot)))
