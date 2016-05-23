@@ -141,7 +141,7 @@
      (lambda(label)
        (if (compare-labels v pc)
 	   pc
-	   (errorf "Mismatched pc ~s for ~s with label ~s~n" pc v label)))
+	   (errorf 'check-variable "Mismatched pc ~s for ~s with label ~s~n" pc v label)))
      (lambda(v) pc))))
 
 (define check-variable*
@@ -161,7 +161,11 @@
   (lambda (label expression pc env)
     (if (compare-labels (eval label) pc)
 	(check-expression expression (eval label) env)
-	(errorf "Mismatched labels ~n -> ~n" (eval label) pc))))
+	(errorf 'check-label-expression
+		"Mismatched labels ~s -> ~s~nFor expression: ~s~n"
+		(eval label)
+		pc
+		expression))))
 
 ;;;
 
