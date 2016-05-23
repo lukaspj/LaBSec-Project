@@ -201,9 +201,16 @@
 
 (define check-if-expression
   (lambda (test consequent alternative pc env)
-    (and (check-expression test pc env)
-         (check-expression consequent pc env)
-         (check-expression alternative pc env))))
+    (let ([cond-label (check-expression test pc env)])
+      (label-join 
+       (check-expression consequent
+                         (label-join cond-label
+                                     pc)
+                         env)
+       (check-expression alternative
+                         (label-join cond-label
+                                     pc)
+                         env)))))
 
 (define check-and-expression
   (lambda (v pc env)
