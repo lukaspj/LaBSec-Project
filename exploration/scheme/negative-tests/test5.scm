@@ -8,12 +8,8 @@
   (label-expression '(label () (confidentiality . 2))
                     42))
 
-(define baz
-  (label-expression '(label () (confidentiality . 2))
-                    40))
-
 (define test
   (label-expression '(label () (confidentiality . 2))
                     (if foo
                         bar
-                        baz)))
+                        40)))
