@@ -29,7 +29,7 @@
 
 (define verify
   (lambda (program)
-    (check-program program '(label () ()) alist-mt)))
+    (check-program program '(label () (confidentiality . 0)) alist-mt)))
 
 
 

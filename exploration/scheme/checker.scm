@@ -7,14 +7,11 @@
 ;;;   http://users-cs.au.dk/danvy/dProgSprog16/Lecture-notes/week-4_a-syntax-checker-for-Scheme.html
 
 (load "checker-aux.scm")
+(load "label-model.scm")
 
 ;;;;;;;;;;
 ;;; Utilities
 ;;;;;;;;;;
-
-(define compare-labels
-  (lambda (l1 l2)
-    #t))
 
 ;;;;;;;;;;
 
@@ -139,9 +136,10 @@
      v
      env
      (lambda(label)
-       (if (compare-labels v pc)
-	   pc
-	   (errorf 'check-variable "Mismatched pc ~s for ~s with label ~s~n" pc v label)))
+       label)
+       ;; (if (label-flows-to pc label)
+       ;; 	   pc
+       ;; 	   (errorf 'check-variable "Mismatched pc ~s for ~s with label ~s~n" pc v label)))
      (lambda(v) pc))))
 
 (define check-variable*
@@ -149,7 +147,7 @@
     (cond
      [(null? v)
       pc]
-     [(pair? v)
+     [(pair? v) ;;TODO should be union
       (check-variable (car v) pc env)
       (check-variable* (cdr v) pc env)]
      [else
@@ -159,13 +157,14 @@
 
 (define check-label-expression
   (lambda (label expression pc env)
-    (if (compare-labels (eval label) pc)
-	(check-expression expression (eval label) env)
-	(errorf 'check-label-expression
-		"Mismatched labels ~s -> ~s~nFor expression: ~s~n"
-		(eval label)
-		pc
-		expression))))
+    (let ([l (eval label)])
+      (if (label-flows-to (check-expression expression l env) l)
+	  l
+	  (errorf 'check-label-expression
+		  "Mismatched labels ~s -> ~s~nFor expression: ~s~n"
+		  pc
+		  l
+		  expression)))))
 
 ;;;
 
