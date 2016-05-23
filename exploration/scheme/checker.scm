@@ -157,12 +157,13 @@
 
 (define check-label-expression
   (lambda (label expression pc env)
-    (let ([l (eval label)])
-      (if (label-flows-to (check-expression expression l env) l)
+    (let ([l (eval label)]
+          [exp-label (check-expression expression pc env)])
+      (if (label-flows-to exp-label l)
 	  l
 	  (errorf 'check-label-expression
 		  "Mismatched labels ~s -> ~s~nFor expression: ~s~n"
-		  pc
+		  exp-label
 		  l
 		  expression)))))
 
