@@ -38,13 +38,13 @@
 
 ;;; label bnf proposal
 ;;; 
-;;; labal     ::= ('label readers* writters*)
+;;; label     ::= ('label readers* writers*)
 ;;; 
 ;;; readers   ::= ('readers principal (principal*))
 ;;; 
-;;; writters  ::= ('writters principal (principal*))
+;;; writers  ::= ('writers principal (principal*))
 ;;; 
-;;; principal ::= 'buttom
+;;; principal ::= 'bottom
 ;;;             | 'top
 ;;;             | <some defined symbol>
 

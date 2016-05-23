@@ -133,7 +133,6 @@
 	   (check-expressions (cdr v) pc env))])))
 
 
-
 (define check-variable
   (lambda (v pc env)
     (alist-lookup
