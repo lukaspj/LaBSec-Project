@@ -453,18 +453,18 @@
 
 (define check-application
   (lambda (v vs pc env)
-                (let ([ret-label (check-expression v pc env)])
-                  (if (label-flows-to pc (lambda-label-end ret-label))
-                      (label-join (lambda-label-end ret-label)
-                                  (check-expressions-with-label-list vs
-                                                                     (lambda-label-params ret-label)
-                                                                     pc
-                                                                     env))
-                      (errorf 'check-application
-                              "Mismatched labels in application with ~s -> ~s~nFor: ~s~n"
-                              pc
-                              ret-label
-                              v)))))
+    (let ([ret-label (check-expression v pc env)])
+      (if (label-flows-to pc (lambda-label-begin ret-label))
+          (label-join (lambda-label-end ret-label)
+                      (check-expressions-with-label-list vs
+                                                         (lambda-label-params ret-label)
+                                                         pc
+                                                         env))
+          (errorf 'check-application
+                  "Mismatched labels in application with ~s -> ~s~nFor: ~s~n"
+                  pc
+                  ret-label
+                  v)))))
 
 (define check-expressions-with-label-list
   (lambda (expressions labels pc env)
@@ -478,9 +478,9 @@
                                             env))
           (label-join (car labels)
                       (check-expressions-with-label-list (cdr expressions)
-                                                        (cdr labels)
-                                                        pc
-                                                        env)))])))
+                                                         (cdr labels)
+                                                         pc
+                                                         env)))])))
 
 ;;; end of week-4_a-syntax-checker-for-Scheme.scm
 
