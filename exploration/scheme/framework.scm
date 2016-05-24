@@ -10,6 +10,12 @@
   (lambda p
     p))
 
+(define-syntax label-lambda
+  (lambda (x)
+    (syntax-case x ()
+      ((_ begin ((i v) ...) end e1 e2 ...)
+       (syntax (lambda (i ...) e1 e2 ...))
+      ))))
 
 (define verify-constraints
   (lambda (file)
