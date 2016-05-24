@@ -205,7 +205,7 @@
                                                                          pc
                                                                          env))])
             (if (label-flows-to ret-label e)
-                (begin (printf "~s ~n" ret-label) e)
+                `(lambda-label b ,(params-to-label-list params) e)
                 (errorf 'check-label-lambda-expression
                         "Mismatched labels for ret-label and end-label~n~s -> ~s For expression: ~s~n"
                         ret-label
@@ -216,6 +216,15 @@
                   pc
                   b
                   body)))))
+
+(define params-to-label-list
+  (lambda (params)
+    (cond
+     [(null? params)
+      '()]
+     [(pair? params)
+      (cons (cadar params)
+            (params-to-label-list params))])))
 
 (define check-label-lambda-formals
   (trace-lambda check-label-formals (params pc env)
