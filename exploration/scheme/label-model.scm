@@ -12,7 +12,8 @@
 
 
 ;; Label Bnf
-;; <Label> ::= <value-label>
+;; <Label> ::= (<Label>*)
+;;           | <value-label>
 ;;           | <lambda-label>
 
 ;; <value-label> ::= (label integrity confidentiality)
@@ -30,7 +31,7 @@
 
 (define is-lambda-label?
   (lambda (v)
-    (is-given-type v 4 'lambda-label)))
+    (is-given-type? v 4 'lambda-label)))
 
 (define value-label-integrity
   (lambda (v)
@@ -52,7 +53,47 @@
   (lambda (v)
     (list-ref v 3)))
 
+(define check-label
+  (lambda (v)
+    (cond
+     [(is-value-label? v)
+      (check-value-label (value-label-integrity v)
+                         (value-label-confidentiality v))]
+     [(is-lambda-label? v)
+      (check-lambda-label (lambda-label-begin v)
+                          (lambda-label-params v)
+                          (lambda-label-end v))]
+     [(pair? v)
+      (if (null? (cdr v))
+          (check-label (car v))
+          (and (check-label (car v))
+               (check-label (cdr v))))]
+     [else
+      (printf "Not a recognized label: ~s~n" v)])))
 
+(define check-value-label
+  (lambda (integrity confidentiality)
+    (and (or (null? integrity)
+             (and (pair? integrity)
+                  (equal? (car integrity) 'integrity)
+                  (number? (cdr integrity))))
+         (or (null? confidentiality)
+             (and (pair? confidentiality)
+                  (equal? (car confidentiality) 'confidentiality)
+                  (number? (cdr confidentiality)))))))
+
+(define check-lambda-label
+  (lambda (begin-label params end-label)
+    (and (check-label begin-label)
+         (check-labels params)
+         (check-label end-label))))
+
+(define check-labels
+  (lambda (vs)
+    (if (null? vs)
+        #t
+        (and (check-label (car vs))
+             (check-labels (cdr vs))))))
 ;;;;;;;;;;;;
 ;;; Flows and joins
 ;;;;;;;;;;;;
