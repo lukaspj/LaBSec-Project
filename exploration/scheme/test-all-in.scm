@@ -9,11 +9,21 @@
     "negative-tests/testLetrecFunctionAccess.scm"
     "negative-tests/testLetrecVariableAccess.scm"
     "negative-tests/testVariableAccess.scm"
+    "negative-tests/testLetAdding.scm"
     "negative-tests/testLambdaAccessIntegrity.scm"
     "negative-tests/testLambdaAccessConfidentiality.scm"
-;    "negative-tests/testLambdaEndLabelNotRestrictiveEnoungh.scm"
-;    "negative-tests/testLambdaInRestrictivePlace.scm"))
-))
+    "negative-tests/testLambdaEndLabelNotRestrictiveEnoungh.scm"
+    "negative-tests/testLambdaInRestrictivePlace.scm"
+    "negative-tests/testPlusIntegrity"))
+
+(define positive-tests
+  '("positive-tests/testHigherConf.scm"
+    "positive-tests/testLowerInt.scm"
+    "positive-tests/testAnd.scm"
+    "positive-tests/testOr.scm"
+    "positive-tests/testIf.scm"
+    "positive-tests/testLetAdding.scm"))
+
 (define try
   (lambda (thunk)
     (call/cc
@@ -22,15 +32,27 @@
         (lambda (x) (if (error? x) (k #f) (raise x)))
         thunk)))))
 
-(define test-all
+(define test-all-negative
   (lambda (tests)
     (cond
      [(null? tests)
       #t]
      [else
       (let ([current (try (lambda () (verify-constraints (car tests))))]
-	    [rest (test-all (cdr tests))])
+	    [rest (test-all-negative (cdr tests))])
 	(if current
 	    (printf "No error in ~s~n" (car tests))
 	    (and (not current)
 		 rest)))])))
+
+(define test-all-positive
+  (lambda (tests)
+    (cond
+     [(null? tests)
+      #t]
+     [else
+      (let ([current (try (lambda () (verify-constraints (car tests))))]
+	    [rest (test-all-positive (cdr tests))])
+	(if current
+	    (and current rest)
+	    (printf "Errors in ~s~n" (car tests))))])))
