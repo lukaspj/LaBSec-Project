@@ -9,7 +9,8 @@
 		    30))
 
 (define baz
-  (label-expression '(label (integrity . 30) (confidentiality . 0))))
+  (label-expression '(label (integrity . 30) (confidentiality . 0))
+                    40))
 
 (define test-if
   (label-expression '(label (integrity . 2) (confidentiality . 10))
