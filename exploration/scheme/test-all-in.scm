@@ -10,7 +10,8 @@
     "negative-tests/testLetrecVariableAccess.scm"
     "negative-tests/testVariableAccess.scm"
     "negative-tests/testLambdaAccessIntegrity.scm"
-    "negative-tests/testLambdaAccessConfidentiality.scm"))
+    "negative-tests/testLambdaAccessConfidentiality.scm"
+    "negative-tests/testLambdaEndLabelNorRestrictiveEnoung.scm"))
 
 (define try
   (lambda (thunk)
