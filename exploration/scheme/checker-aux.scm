@@ -136,6 +136,26 @@
   (lambda (v)
     (list-ref v 1)))
 
+(define is-label-lambda?
+  (lambda (v)
+    (is-given-type? v 5 'label-lambda)))
+
+(define label-lambda-1
+  (lambda (v)
+    (list-ref v 1)))
+
+(define label-lambda-2
+  (lambda (v)
+    (list-ref v 2)))
+
+(define label-lambda-3
+  (lambda (v)
+    (list-ref v 3)))
+
+(define label-lambda-4
+  (lambda (v)
+    (list-ref v 4)))
+
 ;;;;;
 
 ;;; predicate:

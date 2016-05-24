@@ -107,6 +107,12 @@
       ;;; IFC
       [(is-label? v)
        (check-label-expression (label-1 v) (label-2 v) pc env)]
+      [(is-label-lambda? v)
+       (check-label-lambda-expression (label-lambda-1 v)
+                                      (label-lambda-2 v)
+                                      (label-lambda-3 v)
+                                      (label-lambda-4 v)
+                                      pc env)]
       ;;;
       
       [(is-if? v)
@@ -187,6 +193,10 @@
 		  exp-label
 		  l
 		  expression)))))
+
+(define check-label-lambda-expression
+  (lambda (begin-label params end-label body pc env)
+    ))
 
 ;;;
 
