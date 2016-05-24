@@ -177,7 +177,6 @@
    '(printf (lambda-label (label (integrity . 0) (confidentiality . 0))
                           ([s (label (integrity . 0) (confidentiality . 0))])
                           (label (integrity . 0) (confidentiality . 0))))
-                         
    ))
 
 ;;;;;;;;;;;;;;;;;;;
