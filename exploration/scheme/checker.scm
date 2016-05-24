@@ -324,7 +324,7 @@
     (if (proper-list-of-given-length? v 1)
 	(check-expression v pc env)
         (check-expression (cadr v)
-                          (check-expression (car v) pc env)
+                          (check-expression (cadr v) pc env)
                           env))))
 
 (define check-case-expression

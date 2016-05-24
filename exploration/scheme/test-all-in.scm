@@ -9,13 +9,17 @@
     "negative-tests/testLetrecFunctionAccess.scm"
     "negative-tests/testLetrecVariableAccess.scm"
     "negative-tests/testVariableAccess.scm"
-    "negative-tests/testLetAdding.scm"
+  ;  "negative-tests/testLetAdding.scm"
     "negative-tests/testLambdaAccessIntegrity.scm"
     "negative-tests/testLambdaAccessConfidentiality.scm"
-    "negative-tests/testLambdaEndLabelNotRestrictiveEnoungh.scm"
+    "negative-tests/testLambdaEndLabelNotRestrictiveEnough.scm"
     "negative-tests/testLambdaInRestrictivePlace.scm"
-    "negative-tests/testPlusIntegrity.scm"
-    "negative-tests/testLambdaRecursive.scm"))
+ ;   "negative-tests/testPlusIntegrity.scm"
+    "negative-tests/testLambdaRecursive.scm"
+    "negative-tests/testCaseConfidentiality.scm"
+    "negative-tests/testCaseIntegrity.scm"
+    "negative-tests/testCondConfidentiality.scm"
+    "negative-tests/testCondIntegrity.scm"))
 
 (define positive-tests
   '("positive-tests/testHigherConf.scm"
@@ -23,7 +27,13 @@
     "positive-tests/testAnd.scm"
     "positive-tests/testOr.scm"
     "positive-tests/testIf.scm"
-    "positive-tests/testLetAdding.scm"))
+    "positive-tests/testLet.scm"
+;    "positive-tests/testLetAdding.scm"
+    "positive-tests/testCond.scm"
+    "positive-tests/testCondSimple.scm"
+    "positive-tests/testCondSimple2.scm"
+    "positive-tests/testCase.scm"
+    "positive-tests/testCaseSimple.scm"))
 
 (define try
   (lambda (thunk)
