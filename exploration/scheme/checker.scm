@@ -481,19 +481,19 @@
                     (check-lambda-formals (cdr v) pc env))])))
 
 (define check-application
-  (trace-lambda check-app (v vs pc env)
-                (let ([ret-label (check-expression v pc env)])
-                  (if (equal? 'this ret-label)
-                      pc
-                      (if (label-flows-to (lambda-label-end ret-label) pc)
-                          (label-join (lambda-label-end ret-label)
-                                      (check-expressions-with-label-list
-                                         vs
-                                         (lambda-label-params ret-label)
-                                         pc
-                                         env))
-                          (errorf 'check-application
-                                  "Mismatched return label in application with ~s -> ~s~nFor: ~s~n"
+  (lambda (v vs pc env)
+    (let ([ret-label (check-expression v pc env)])
+      (if (equal? 'this ret-label)
+          pc
+          (if (label-flows-to (lambda-label-end ret-label) pc)
+              (label-join (lambda-label-end ret-label)
+                          (check-expressions-with-label-list
+                           vs
+                           (lambda-label-params ret-label)
+                           pc
+                           env))
+              (errorf 'check-application
+                      "Mismatched return label in application with ~s -> ~s~nFor: ~s~n"
                                   pc
                                   ret-label
                                   v))))))
@@ -514,11 +514,11 @@
                                                            pc
                                                            env)
                         (car labels))
-          (errorf 'check-expressions-with-label-list
-                  "Mismatched labels in parameters with ~s -> ~s~nFor: ~s~n"
-                  param-label
-                  (car labels)
-                  (car expressions))))])))
+            (errorf 'check-expressions-with-label-list
+                    "Mismatched labels in parameters with ~s -> ~s~nFor: ~s~n"
+                    param-label
+                    (car labels)
+                    (car expressions))))])))
 
 ;;; end of week-4_a-syntax-checker-for-Scheme.scm
 
