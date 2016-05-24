@@ -9,11 +9,11 @@
 		    30))
 
 (define baz
-  (label-expression '(label (integrity . 30) (confidentiality . 0))
+  (label-expression '(label (integrity . 3) (confidentiality . 0))
 		    20))
 
 (define test-let
   (label-expression '(label (integrity . 0) ())
-		    (let ([a (label-expression '(label (integrity . 32) (confidentiality . 10))
-					       baz)])
+		    (let ([a (label-expression '(label (integrity . 5) (confidentiality . 10))
+					       (+ bar baz))])
 			(+ a foo))))
