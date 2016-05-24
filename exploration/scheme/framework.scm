@@ -18,7 +18,7 @@
       ))))
 
 (define verify-constraints
-  (trace-lambda verify (file)
+  (lambda (file)
     (check-file file '(label () (confidentiality . 0)) alist-mt)))
 
 
