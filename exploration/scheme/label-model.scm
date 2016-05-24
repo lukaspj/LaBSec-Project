@@ -19,6 +19,9 @@
 ;; <value-label> ::= (label integrity confidentiality)
 
 ;; <lambda-label> ::= (lambda-label <value-label> (<value-label>*) <value-label>)
+;;                  | (lambda-label <label-var> (<value-label>*) <value-label>)
+
+;; <label-var> ::= (label-var <symbol>)
 
 (define is-given-type?
   (lambda (v length type)
@@ -156,9 +159,25 @@
 
 (define label-flows-to
   (lambda (l1 l2)
-    (and (check-integrity-flows-to l1 l2)
-	 (check-confidentiality-flows-to l1 l2))))
+    (if (and (is-value-label? l1)
+             (is-value-label? l2))
+        (and (check-integrity-flows-to l1 l2)
+             (check-confidentiality-flows-to l1 l2))
+        (errorf 'label-flows-to
+                "Both labels is not value labels ~s, ~s~n"
+                l1 l2))))
 
+;;;;;;;;;;;;;;;;;;;
+;;; Predifined env
+;;;;;;;;;;;;;;;;;;;
+
+(define labels_of_predefined_functions
+  (list
+   (+ '(lambda-label (label-var L)
+                     ([x L]
+                      [y L])
+                     L))
+   ))
 
 ;;;;;;;;;;;;;;;;;;;
 ;;; Unit test
