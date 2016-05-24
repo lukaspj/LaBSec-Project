@@ -173,7 +173,7 @@
 
 (define labels_of_predefined_functions
   (list
-   (+ '(lambda-label (label-var L)
+   '(+ (lambda-label (label-var L)
                      ([x L]
                       [y L])
                      L))
