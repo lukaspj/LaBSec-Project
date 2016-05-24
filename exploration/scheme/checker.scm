@@ -285,7 +285,7 @@
      [(null? v)
       pc]
      [(is-else? (car v))
-      (check-expression (cdar v) pc env)]
+      (check-expression (cadar v) pc env)]
      [(pair? v)
       (check-cond-clauses
        (cdr v)
@@ -313,7 +313,7 @@
      [(null? v)
       pc]
      [(is-else? (car v))
-      (check-expression (cdar v) pc env)]
+      (check-expression (cadar v) pc env)]
      [(pair? v)
       (check-case-clauses (cdr v)
                           (check-case-clause (car v) pc env)
@@ -322,7 +322,7 @@
 (define check-case-clause
   (lambda (v pc env)
     ;(check-quotations (car v) pc env)
-    (check-expression (cdr v) pc env)))
+    (check-expression (cadr v) pc env)))
 
 (define check-let-expression
   (lambda (bindings body pc env)
