@@ -156,6 +156,18 @@
   (lambda (v)
     (list-ref v 4)))
 
+(define is-set?
+  (lambda (v)
+    (is-given-type? v 3 'set!)))
+
+(define set-1
+  (lambda (v)
+    (list-ref v 1)))
+
+(define set-2
+  (lambda (v)
+    (list-ref v 2)))
+
 ;;;;;
 
 ;;; predicate:
