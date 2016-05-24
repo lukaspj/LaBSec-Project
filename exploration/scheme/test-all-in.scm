@@ -14,7 +14,8 @@
     "negative-tests/testLambdaAccessConfidentiality.scm"
     "negative-tests/testLambdaEndLabelNotRestrictiveEnoungh.scm"
     "negative-tests/testLambdaInRestrictivePlace.scm"
-    "negative-tests/testPlusIntegrity"))
+    "negative-tests/testPlusIntegrity.scm"
+    "negative-tests/testLambdaRecursive.scm"))
 
 (define positive-tests
   '("positive-tests/testHigherConf.scm"

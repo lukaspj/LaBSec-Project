@@ -472,11 +472,11 @@
      [(null? expressions)
       pc]
      [(pair? expressions)
-      (if (label-flows-to (car labels)
+      (if (label-flows-to (eval (car labels))
                           (check-expression (car expressions)
                                             pc ; TODO should this be (car labels) ?
                                             env))
-          (label-join (car labels)
+          (label-join (eval (car labels))
                       (check-expressions-with-label-list (cdr expressions)
                                                          (cdr labels)
                                                          pc
