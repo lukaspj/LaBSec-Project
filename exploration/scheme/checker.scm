@@ -80,7 +80,7 @@
 
 (define check-definition
   (lambda (name definiens pc env)
-    (let ([label (check-expression definiens pc (alist-extend name 'this env))])
+    (let ([label (check-expression definiens pc (alist-extend name 'predefined env))])
       (alist-extend name label env))))
 
 ;;;;;;;;;;
@@ -167,8 +167,8 @@
      v
      env
      (lambda(label)
-       (if (equal? label 'this)
-           'this
+       (if (equal? label 'predefined)
+           'predefined
            (label-join label pc)))
      (lambda(v)
        pc))))
@@ -187,7 +187,7 @@
 ;;; IFC
 
 (define check-label-expression
-  (lambda (label expression pc env)
+  (trace-lambda check-label-expression (label expression pc env)
     (let ([l (eval label)]
           [exp-label (check-expression expression pc env)])
       (if (label-flows-to exp-label l)
@@ -480,11 +480,20 @@
       (alist-extend (car v) (check-variable (car v) pc env)
                     (check-lambda-formals (cdr v) pc env))])))
 
+(define join-all-labels
+  (lambda (vs pc env)
+    (cond
+     [(null? vs)
+      '(label () (confidentiality . 0))]
+     [else
+      (label-join (check-expression (car vs) pc env)
+                  (join-all-labels (cdr vs) pc env))])))
+
 (define check-application
-  (lambda (v vs pc env)
+  (trace-lambda check-application (v vs pc env)
     (let ([ret-label (check-expression v pc env)])
-      (if (equal? 'this ret-label)
-          pc
+      (if (equal? 'predefined ret-label)
+          (join-all-labels vs pc env)
           (if (label-flows-to (lambda-label-end ret-label) pc)
               (label-join (lambda-label-end ret-label)
                           (check-expressions-with-label-list
@@ -499,26 +508,26 @@
                                   v))))))
 
 (define check-expressions-with-label-list
-  (lambda (expressions labels pc env)
+  (trace-lambda with-label (actuals formals pc env)
     (cond
-     [(null? expressions)
+     [(null? actuals)
       pc]
-     [(pair? expressions)
-      (let ([param-label (check-expression (car expressions)
+     [(pair? actuals)
+      (let ([actual-label (check-expression (car actuals)
                                             pc ; TODO should this be (car labels) ?
                                             env)])
-        (if (label-flows-to param-label
-                            (car labels))
-            (label-join (check-expressions-with-label-list (cdr expressions)
-                                                           (cdr labels)
+        (if (label-flows-to actual-label
+                            (car formals))
+            (label-join (check-expressions-with-label-list (cdr actuals)
+                                                           (cdr formals)
                                                            pc
                                                            env)
-                        (car labels))
+                        (car formals))
             (errorf 'check-expressions-with-label-list
                     "Mismatched labels in parameters with ~s -> ~s~nFor: ~s~n"
-                    param-label
-                    (car labels)
-                    (car expressions))))])))
+                    actual-label
+                    (car formals)
+                    (car actuals))))])))
 
 ;;; end of week-4_a-syntax-checker-for-Scheme.scm
 

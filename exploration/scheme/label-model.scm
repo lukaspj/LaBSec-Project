@@ -173,10 +173,11 @@
 
 (define labels_of_predefined_functions
   (list
-   (+ '(lambda-label (label-var L)
-                     ([x L]
-                      [y L])
-                     L))
+   '(+ . predefined)
+   '(printf (lambda-label (label (integrity . 0) (confidentiality . 0))
+                          ([s (label (integrity . 0) (confidentiality . 0))])
+                          (label (integrity . 0) (confidentiality . 0))))
+                         
    ))
 
 ;;;;;;;;;;;;;;;;;;;
