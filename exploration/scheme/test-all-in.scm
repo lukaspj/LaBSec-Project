@@ -22,7 +22,7 @@
         thunk)))))
 
 (define test-all
-  (trace-lambda test-all (tests)
+  (lambda (tests)
     (cond
      [(null? tests)
       #t]
