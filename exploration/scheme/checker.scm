@@ -205,7 +205,7 @@
                                                                          pc
                                                                          env))])
             (if (label-flows-to ret-label e)
-                `(lambda-label b ,(params-to-label-list params) e)
+                `(lambda-label ,b ,(params-to-label-list params) ,e)
                 (errorf 'check-label-lambda-expression
                         "Mismatched labels for ret-label and end-label~n~s -> ~s For expression: ~s~n"
                         ret-label
@@ -227,7 +227,7 @@
             (params-to-label-list params))])))
 
 (define check-label-lambda-formals
-  (trace-lambda check-label-formals (params pc env)
+  (lambda (params pc env)
     (cond
      [(null? params)
       env]
@@ -419,11 +419,22 @@
       [else
        #f])))
 
+(define formals-to-list-of
+  (lambda (formals pc)
+    (cond
+     [(pair? pc)
+      (cons pc
+            (formals-to-list-of (cdr formals) pc))]
+     [else
+      '()])))
+
 (define check-lambda
   (lambda (formals expression pc env)
-    (check-expression expression
-                      pc
-                      (check-lambda-formals formals pc env))))
+    `(lambda-label ,pc
+                   (formals-to-list-of formals pc)
+                   ,(check-expression expression
+                                      pc
+                                      (check-lambda-formals formals pc env)))))
 
 (define check-trace-lambda
   (lambda (name formals expression pc env)
@@ -443,13 +454,33 @@
 (define check-application
   (lambda (v vs pc env)
                 (let ([ret-label (check-expression v pc env)])
-                  (if (label-flows-to pc ret-label)
-                      (label-join ret-label (check-expressions vs pc env))
+                  (if (label-flows-to pc (lambda-label-end ret-label))
+                      (label-join (lambda-label-end ret-label)
+                                  (check-expressions-with-label-list vs
+                                                                     (lambda-label-params ret-label)
+                                                                     pc
+                                                                     env))
                       (errorf 'check-application
                               "Mismatched labels in application with ~s -> ~s~nFor: ~s~n"
                               pc
                               ret-label
                               v)))))
+
+(define check-expressions-with-label-list
+  (lambda (expressions labels pc env)
+    (cond
+     [(null? expressions)
+      pc]
+     [(pair? expressions)
+      (if (label-flows-to (car labels)
+                          (check-expression (car expressions)
+                                            pc ; TODO should this be (car labels) ?
+                                            env))
+          (label-join (car labels)
+                      (check-expressions-with-label-list (cdr expressions)
+                                                        (cdr labels)
+                                                        pc
+                                                        env)))])))
 
 ;;; end of week-4_a-syntax-checker-for-Scheme.scm
 

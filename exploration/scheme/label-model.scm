@@ -30,7 +30,7 @@
 
 (define is-lambda-label?
   (lambda (v)
-    (is-given-type v 4 'lambda-label)))
+    (is-given-type? v 4 'lambda-label)))
 
 (define value-label-integrity
   (lambda (v)
@@ -101,7 +101,17 @@
   
 (define label-join
   (lambda (l1 l2)
-    `(label ,(join-integrity l1 l2) ,(join-confidentiality l1 l2))))
+    (if (is-lambda-label? l1)
+        (if (is-lambda-label? l2)
+            (list l1 l2)
+            `(lambda-label ,(lambda-label-begin l1)
+                           ,(lambda-label-params l1)
+                           ,(label-join (lambda-label-end l1) l2)))
+        (if (is-lambda-label? l2)
+            `(lambda-label ,(lambda-label-begin l2)
+                           ,(lambda-label-params l2)
+                           ,(label-join (lambda-label-end l2) l1))
+            `(label ,(join-integrity l1 l2) ,(join-confidentiality l1 l2))))))
 
 (define label-flows-to
   (lambda (l1 l2)

@@ -11,9 +11,9 @@
     "negative-tests/testVariableAccess.scm"
     "negative-tests/testLambdaAccessIntegrity.scm"
     "negative-tests/testLambdaAccessConfidentiality.scm"
-    "negative-tests/testLambdaEndLabelNotRestrictiveEnoungh.scm"
-    "negative-tests/testLambdaInRestrictivePlace.scm"))
-
+;    "negative-tests/testLambdaEndLabelNotRestrictiveEnoungh.scm"
+;    "negative-tests/testLambdaInRestrictivePlace.scm"))
+))
 (define try
   (lambda (thunk)
     (call/cc
