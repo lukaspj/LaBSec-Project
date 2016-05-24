@@ -196,7 +196,40 @@
 
 (define check-label-lambda-expression
   (lambda (begin-label params end-label body pc env)
-    pc))
+    (let ([b (eval begin-label)]
+          [e (eval end-label)])
+      (if (label-flows-to pc b)
+          (let ([ret-label (check-expression body
+                                             b
+                                             (check-label-lambda-formals params
+                                                                         pc
+                                                                         env))])
+            (if (label-flows-to ret-label e)
+                (begin (printf "~s ~n" ret-label) e)
+                (errorf 'check-label-lambda-expression
+                        "Mismatched labels for ret-label and end-label~n~s -> ~s For expression: ~s~n"
+                        ret-label
+                        e
+                        body)))
+          (errorf 'check-label-lambda-expression
+                  "Mismatched labels for pc and begin-label with ~s -> ~s~n For expression: ~s~n"
+                  pc
+                  b
+                  body)))))
+
+(define check-label-lambda-formals
+  (trace-lambda check-label-formals (params pc env)
+    (cond
+     [(null? params)
+      env]
+     [(pair? params)
+      (let ([varname (caar params)]
+            [label (cadar params)])
+        (alist-extend varname
+                      label
+                      (check-label-lambda-formals (cdr params)
+                                                  pc
+                                                  env)))])))
 
 ;;;
 
@@ -400,8 +433,14 @@
 
 (define check-application
   (lambda (v vs pc env)
-    (and (check-expression v pc env)
-	 (check-expressions vs pc env))))
+                (let ([ret-label (check-expression v pc env)])
+                  (if (label-flows-to pc ret-label)
+                      (label-join ret-label (check-expressions vs pc env))
+                      (errorf 'check-application
+                              "Mismatched labels in application with ~s -> ~s~nFor: ~s~n"
+                              pc
+                              ret-label
+                              v)))))
 
 ;;; end of week-4_a-syntax-checker-for-Scheme.scm
 
