@@ -187,7 +187,7 @@
 ;;; IFC
 
 (define check-label-expression
-  (trace-lambda check-label-expression (label expression pc env)
+  (lambda (label expression pc env)
     (let ([l (eval label)]
           [exp-label (check-expression expression pc env)])
       (if (label-flows-to exp-label l)
@@ -311,7 +311,7 @@
      [(null? v)
       pc]
      [(is-else? (car v))
-      (check-expression (cdar v) pc env)]
+      (check-expression (cadar v) pc env)]
      [(pair? v)
       (check-cond-clauses
        (cdr v)
@@ -324,7 +324,7 @@
     (if (proper-list-of-given-length? v 1)
 	(check-expression v pc env)
         (check-expression (cadr v)
-                          (check-expression (car v) pc env)
+                          (check-expression (cadr v) pc env)
                           env))))
 
 (define check-case-expression
@@ -339,7 +339,7 @@
      [(null? v)
       pc]
      [(is-else? (car v))
-      (check-expression (cdar v) pc env)]
+      (check-expression (cadar v) pc env)]
      [(pair? v)
       (check-case-clauses (cdr v)
                           (check-case-clause (car v) pc env)
@@ -348,7 +348,7 @@
 (define check-case-clause
   (lambda (v pc env)
     ;(check-quotations (car v) pc env)
-    (check-expression (cdr v) pc env)))
+    (check-expression (cadr v) pc env)))
 
 (define check-let-expression
   (lambda (bindings body pc env)
@@ -490,7 +490,7 @@
                   (join-all-labels (cdr vs) pc env))])))
 
 (define check-application
-  (trace-lambda check-application (v vs pc env)
+  (lambda (v vs pc env)
     (let ([ret-label (check-expression v pc env)])
       (if (equal? 'predefined ret-label)
           (join-all-labels vs pc env)
@@ -508,7 +508,7 @@
                                   v))))))
 
 (define check-expressions-with-label-list
-  (trace-lambda with-label (actuals formals pc env)
+  (lambda (actuals formals pc env)
     (cond
      [(null? actuals)
       pc]
