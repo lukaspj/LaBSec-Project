@@ -19,8 +19,20 @@
 
 (define verify-constraints
   (lambda (file)
-    (check-file file '(label () (confidentiality . 0)) alist-mt)))
+    (check-file file '(label () (confidentiality . 0))
+                (get-env-from-predefs labels_of_predefined_functions
+                                      alist-mt))))
 
+(define get-env-from-predefs
+  (lambda (predefs env)
+    (cond
+     [(null? predefs)
+      env]
+     [else
+      (alist-extend (caar predefs)
+                    (cdar predefs)
+                    (get-env-from-predefs (cdr predefs) env))])))
+    
 
 ;;; label bnf proposal
 ;;; 
