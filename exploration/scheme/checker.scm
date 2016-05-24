@@ -223,7 +223,7 @@
      [(null? params)
       '()]
      [(pair? params)
-      (cons (cadar params)
+      (cons (eval (cadar params))
             (params-to-label-list params))])))
 
 (define check-label-lambda-formals
@@ -235,7 +235,7 @@
       (let ([varname (caar params)]
             [label (cadar params)])
         (alist-extend varname
-                      label
+                      (eval label)
                       (check-label-lambda-formals (cdr params)
                                                   pc
                                                   env)))])))
