@@ -91,7 +91,7 @@
 ;;;;;;;;;;
 
 (define check-expression
-  (lambda (v pc env)
+  (trace-lambda check-expression (v pc env)
     (cond
       [(is-number? v)
        (check-number v pc env)]
@@ -214,7 +214,7 @@
 			    env)])))  
 
 (define check-or-expression
-  (trace-lambda check-or (v pc env)
+  (lambda (v pc env)
     (cond
      [(null? v)
       pc]
@@ -369,14 +369,15 @@
 
 (define check-lambda
   (lambda (formals expression pc env)
-    (and (check-lambda-formals formals pc env)
-	 (check-expression expression pc env))))
+    (check-expression expression
+                      pc
+                      (check-lambda-formals formals pc env))))
 
 (define check-trace-lambda
   (lambda (name formals expression pc env)
-    (and (symbol? name)
-	 (check-lambda-formals formals pc env)
-	 (check-expression expression pc env))))
+    (check-expression expression
+                      pc
+                      (check-lambda-formals formals pc env))))
 
 (define check-lambda-formals
   (lambda (v pc env)

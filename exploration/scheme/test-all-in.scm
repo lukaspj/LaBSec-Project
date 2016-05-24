@@ -1,14 +1,16 @@
 (load "framework.scm")
 
 (define negative-tests
-  '("negative-tests/test1.scm"
-    "negative-tests/test2.scm"
-    "negative-tests/test3.scm"
-    "negative-tests/test4.scm"
-    "negative-tests/test5.scm"
-    "negative-tests/test6.scm"
-    "negative-tests/test7.scm"
-    "negative-tests/test8.scm"))
+  '("negative-tests/testAndConfidentiality.scm"
+    "negative-tests/testAndIntegrity.scm"
+    "negative-tests/testOrConfidentiality.scm"
+    "negative-tests/testOrIntegrity.scm"
+    "negative-tests/testLetVariableAccess.scm"
+    "negative-tests/testLetrecFunctionAccess.scm"
+    "negative-tests/testLetrecVariableAccess.scm"
+    "negative-tests/testVariableAccess.scm"
+    "negative-tests/testLambdaAccessIntegrity.scm"
+    "negative-tests/testLambdaAccessConfidentiality.scm"))
 
 (define try
   (lambda (thunk)
@@ -19,7 +21,7 @@
         thunk)))))
 
 (define test-all
-  (lambda (tests)
+  (trace-lambda test-all (tests)
     (cond
      [(null? tests)
       #t]
