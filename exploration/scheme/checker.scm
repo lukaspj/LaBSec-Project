@@ -199,7 +199,11 @@
     (let ([b (eval begin-label)]
           [e (eval end-label)])
       (if (label-flows-to pc b)
-          (let ([ret-label (check-expression body b env)])
+          (let ([ret-label (check-expression body
+                                             b
+                                             (check-label-lambda-formals params
+                                                                         pc
+                                                                         env))])
             (if (label-flows-to ret-label e)
                 (begin (printf "~s ~n" ret-label) e)
                 (errorf 'check-label-lambda-expression
@@ -212,6 +216,20 @@
                   pc
                   b
                   body)))))
+
+(define check-label-lambda-formals
+  (trace-lambda check-label-formals (params pc env)
+    (cond
+     [(null? params)
+      env]
+     [(pair? params)
+      (let ([varname (caar params)]
+            [label (cadar params)])
+        (alist-extend varname
+                      label
+                      (check-label-lambda-formals (cdr params)
+                                                  pc
+                                                  env)))])))
 
 ;;;
 
