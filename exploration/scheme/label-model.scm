@@ -11,8 +11,51 @@
 ;      #t)))
 
 
-(define bot-inte)
-(define bot-conf)
+;; Label Bnf
+;; <Label> ::= <value-label>
+;;           | <lambda-label>
+
+;; <value-label> ::= (label integrity confidentiality)
+
+;; <lambda-label> ::= (lambda-label <value-label> (<value-label>*) <value-label>)
+
+(define is-given-type?
+  (lambda (v length type)
+    (and (proper-list-of-given-length? v length)
+         (equal? (car v) type))))
+
+(define is-value-label?
+  (lambda (v)
+    (is-given-type? v 3 'label)))
+
+(define is-lambda-label?
+  (lambda (v)
+    (is-given-type v 4 'lambda-label)))
+
+(define value-label-integrity
+  (lambda (v)
+    (list-ref v 1)))
+
+(define value-label-confidentiality
+  (lambda (v)
+    (list-ref v 2)))
+
+(define lambda-label-begin
+  (lambda (v)
+    (list-ref v 1)))
+
+(define lambda-label-params
+  (lambda (v)
+    (list-ref v 2)))
+
+(define lambda-label-end
+  (lambda (v)
+    (list-ref v 3)))
+
+
+;;;;;;;;;;;;
+;;; Flows and joins
+;;;;;;;;;;;;
 
 ;;; Centralized-One-dimensional label model
 (define check-integrity-flows-to
@@ -64,6 +107,11 @@
   (lambda (l1 l2)
     (and (check-integrity-flows-to l1 l2)
 	 (check-confidentiality-flows-to l1 l2))))
+
+
+;;;;;;;;;;;;;;;;;;;
+;;; Unit test
+;;;;;;;;;;;;;;;;;;;
 
 (define toptop
   '(label () ()))
