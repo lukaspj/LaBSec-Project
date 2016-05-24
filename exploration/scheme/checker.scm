@@ -91,7 +91,7 @@
 ;;;;;;;;;;
 
 (define check-expression
-  (trace-lambda check-expression (v pc env)
+  (lambda (v pc env)
     (cond
       [(is-number? v)
        (check-number v pc env)]
@@ -196,7 +196,7 @@
 
 (define check-label-lambda-expression
   (lambda (begin-label params end-label body pc env)
-    ))
+    pc))
 
 ;;;
 
@@ -392,10 +392,11 @@
 (define check-lambda-formals
   (lambda (v pc env)
     (cond
-     [(is-variable? v)
-      (check-variable v pc env)]
-     [(list? v)
-      (check-variable* v pc env)])))
+     [(null? v)
+      env]
+     [(pair? v)
+      (alist-extend (car v) (check-variable (car v) pc env)
+                    (check-lambda-formals (cdr v) pc env))])))
 
 (define check-application
   (lambda (v vs pc env)
