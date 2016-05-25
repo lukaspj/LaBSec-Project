@@ -115,6 +115,8 @@
                                       pc env)]
       [(is-set? v)
        (check-set-expression (set-1 v) (set-2 v) pc env)]
+      [(is-declassify? v)
+       (check-declassify-expression (declassify-1 v) (declassify-2 v) pc env)]
       ;;;
       
       [(is-if? v)
@@ -199,7 +201,7 @@
 		  expression)))))
 
 (define check-label-lambda-expression
-  (lambda (begin-label params end-label body pc env)
+  (trace-lambda label-lambda (begin-label params end-label body pc env)
     (let ([b (eval begin-label)]
           [e (eval end-label)])
       (if (label-flows-to pc b)
@@ -265,6 +267,10 @@
                 name
                 val-expr)
          pc)))))
+
+(define check-declassify-expression
+  (lambda (label expr pc env)
+    (eval label)))
 
 ;;;
 
@@ -490,22 +496,22 @@
                   (join-all-labels (cdr vs) pc env))])))
 
 (define check-application
-  (lambda (v vs pc env)
+  (trace-lambda check-app (v vs pc env)
     (let ([ret-label (check-expression v pc env)])
       (if (equal? 'predefined ret-label)
           (join-all-labels vs pc env)
-          (if (label-flows-to (lambda-label-end ret-label) pc)
-              (label-join (lambda-label-end ret-label)
-                          (check-expressions-with-label-list
-                           vs
-                           (lambda-label-params ret-label)
-                           pc
-                           env))
-              (errorf 'check-application
-                      "Mismatched return label in application with ~s -> ~s~nFor: ~s~n"
-                                  pc
-                                  ret-label
-                                  v))))))
+          (let ([end-label (lambda-label-end ret-label)])
+            (if (label-flows-to end-label pc)
+                (begin (check-expressions-with-label-list vs
+                                                          (lambda-label-params ret-label)
+                                                          pc
+                                                          env)
+                       end-label)
+                (errorf 'check-application
+                        "Mismatched return label in application with ~s -> ~s~nFor: ~s~n"
+                        end-label
+                        pc
+                        v)))))))
 
 (define check-expressions-with-label-list
   (lambda (actuals formals pc env)

@@ -30,18 +30,6 @@
 ;;   (lambda (filename data)
 ;;     (printf "~s: ~s ~n" filename data)))
 
-(define fetch-data-from-web-page
-  (label-lambda '(label () (confidentiality . 0))
-                ([username '(label () (confidentiality . 0))]
-                 [password '(label () ())])
-                '(label () (confidentiality . 1))
-                (store-data
-                 "s-stuff.png"
-                 (download-user-data
-                  "strange-stuff.png"
-                  (log-in username
-                          (hash password))))))
-
 (define download-user-data
   (label-lambda '(label () (confidentiality . 0))
                 ([file '(label () (confidentiality . 1))]
@@ -60,11 +48,24 @@
   (label-lambda '(label () (confidentiality . 0))
                 ([v '(label () ())])
                 '(label () (confidentiality . 3))
-                v))
+                (declassify '(label () (confidentiality . 3)) v)))
 
 (define store-data
   (label-lambda '(label () (confidentiality . 0))
                 ([filename '(label () (confidentiality . 0))]
                  [data '(label () (confidentiality . 0))])
                 '(label () (confidentiality . 0))
-                (printf "~s: ~s ~n" filename data)))
+                (declassify '(label () (confidentiality . 0))
+                            (printf "~s: ~s ~n" filename data)))) ;; Fix need of declassify here
+
+(define fetch-data-from-web-page
+  (label-lambda '(label () (confidentiality . 0))
+                ([username '(label () (confidentiality . 0))]
+                 [password '(label () ())])
+                '(label () (confidentiality . 1))
+                (store-data
+                 "s-stuff.png"
+                 (download-user-data
+                  "strange-stuff.png"
+                  (log-in username
+                          (hash password))))))

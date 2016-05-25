@@ -168,6 +168,18 @@
   (lambda (v)
     (list-ref v 2)))
 
+(define is-declassify?
+  (lambda (v)
+    (is-given-type? v 3 'declassify)))
+
+(define declassify-1
+  (lambda (v)
+    (list-ref v 1)))
+
+(define declassify-2
+  (lambda (v)
+    (list-ref v 2)))
+
 ;;;;;
 
 ;;; predicate:

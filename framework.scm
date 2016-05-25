@@ -6,6 +6,10 @@
   (lambda (label expr)
     expr))
 
+(define declassify
+  (lambda (label expr)
+    expr))
+
 (define principals
   (lambda p
     p))
