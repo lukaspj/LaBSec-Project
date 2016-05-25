@@ -45,26 +45,32 @@
         thunk)))))
 
 (define test-all-negative
-  (lambda (tests)
-    (cond
-     [(null? tests)
-      #t]
-     [else
-      (let ([current (try (lambda () (verify-constraints (car tests))))]
-	    [rest (test-all-negative (cdr tests))])
-	(if current
-	    (printf "No error in ~s~n" (car tests))
-	    (and (not current)
-		 rest)))])))
+  (lambda ()
+    (letrec ([visit (lambda (tests)
+                      (cond
+                       [(null? tests)
+                        #t]
+                       [else
+                        (let ([current (try (lambda ()
+                                              (verify-constraints (car tests))))]
+                              [rest (visit (cdr tests))])
+                          (if current
+                              (printf "No error in ~s~n" (car tests))
+                              (and (not current)
+                                   rest)))]))])
+      (visit negative-tests))))
 
 (define test-all-positive
-  (lambda (tests)
-    (cond
-     [(null? tests)
-      #t]
-     [else
-      (let ([current (try (lambda () (verify-constraints (car tests))))]
-	    [rest (test-all-positive (cdr tests))])
-	(if current
-	    (and current rest)
-	    (printf "Errors in ~s~n" (car tests))))])))
+  (lambda ()
+    (letrec ([visit (lambda (tests)
+                      (cond
+                       [(null? tests)
+                        #t]
+                       [else
+                        (let ([current (try (lambda ()
+                                              (verify-constraints (car tests))))]
+                              [rest (visit (cdr tests))])
+                          (if current
+                              (and current rest)
+                              (printf "Errors in ~s~n" (car tests))))]))])
+      (visit positive-tests))))
