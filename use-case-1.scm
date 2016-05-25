@@ -1,6 +1,10 @@
 (load "framework.scm")
 
-; Open-web-page -> hash(declassify) -> log-in -> download-data -> store-data
+;; Open-web-page -> hash(declassify) -> log-in -> download-data -> store-data
+;; 0 : alle (public)
+;; 1 : brugere
+;; 2 : mods
+;; 3 : admins
 
 ;; (define fetch-data-from-web-page
 ;;   (lambda (username password)
@@ -27,39 +31,40 @@
 ;;     (printf "~s: ~s ~n" filename data)))
 
 (define fetch-data-from-web-page
-  (label-lambda '(label () ())
-                ([username '(label () ())]
+  (label-lambda '(label () (confidentiality . 0))
+                ([username '(label () (confidentiality . 0))]
                  [password '(label () ())])
-                '(label () ())
+                '(label () (confidentiality . 1))
                 (store-data
                  "s-stuff.png"
-                 (download-data
+                 (download-user-data
                   "strange-stuff.png"
-                  (log-in username (hash password))))))
+                  (log-in username
+                          (hash password))))))
 
-(define download-data
-  (label-lambda '(label () ())
-                ([file '(label () ())]
-                 [access-token '(label () ())])
-                '(label () ())
+(define download-user-data
+  (label-lambda '(label () (confidentiality . 0))
+                ([file '(label () (confidentiality . 1))]
+                 [access-token '(label () (confidentiality . 1))])
+                '(label () (confidentiality . 1))
                 "Some data array"))
 
 (define log-in
-  (label-lambda '(label () ())
-                ([username '(label () ())]
-                 [password '(label () ())])
+  (label-lambda '(label () (confidentiality . 0))
+                ([username '(label () (confidentiality . 0))]
+                 [passwordhash '(label () (confidentiality . 3))])
                 '(label () ())
                 '(auth 1002)))
 
 (define hash
-  (label-lambda '(label () ())
+  (label-lambda '(label () (confidentiality . 0))
                 ([v '(label () ())])
-                '(label () ())
+                '(label () (confidentiality . 3))
                 v))
 
 (define store-data
-  (label-lambda '(label () ())
-                ([filename '(label () ())]
-                 [data '(label () ())])
-                '(label () ())
+  (label-lambda '(label () (confidentiality . 0))
+                ([filename '(label () (confidentiality . 0))]
+                 [data '(label () (confidentiality . 0))])
+                '(label () (confidentiality . 0))
                 (printf "~s: ~s ~n" filename data)))
