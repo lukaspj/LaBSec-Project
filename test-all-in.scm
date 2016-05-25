@@ -34,6 +34,8 @@
     "positive-tests/testCondSimple2.scm"
     "positive-tests/testCase.scm"
     "positive-tests/testCaseSimple.scm"
+    "positive-tests/testRecursion.scm"
+    "positive-tests/testLetrecRecursion.scm"
     "positive-tests/testLambda.scm"))
 
 (define try

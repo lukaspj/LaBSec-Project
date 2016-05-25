@@ -91,7 +91,7 @@
 ;;;;;;;;;;
 
 (define check-expression
-  (lambda (v pc env)
+  (trace-lambda check-expr (v pc env)
     (cond
       [(is-number? v)
        (check-number v pc env)]
@@ -411,7 +411,9 @@
     (alist-extend (car v)
                   (label-join (check-expression (cadr v)
                                                 pc
-                                                env)
+                                                (alist-extend (car v)
+                                                              'predefined
+                                                              env))
                               pc)
                   env)))
 
@@ -454,7 +456,7 @@
 (define formals-to-list-of
   (lambda (formals pc)
     (cond
-     [(pair? pc)
+     [(pair? formals)
       (cons pc
             (formals-to-list-of (cdr formals) pc))]
      [else
@@ -463,7 +465,7 @@
 (define check-lambda
   (lambda (formals expression pc env)
     `(lambda-label ,pc
-                   (formals-to-list-of formals pc)
+                   ,(formals-to-list-of formals pc)
                    ,(check-expression expression
                                       pc
                                       (check-lambda-formals
@@ -483,7 +485,7 @@
      [(null? v)
       env]
      [(pair? v)
-      (alist-extend (car v) (check-variable (car v) pc env)
+      (alist-extend (car v) pc
                     (check-lambda-formals (cdr v) pc env))])))
 
 (define join-all-labels
