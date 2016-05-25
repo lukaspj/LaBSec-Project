@@ -91,7 +91,7 @@
 ;;;;;;;;;;
 
 (define check-expression
-  (trace-lambda check-expr (v pc env)
+  (lambda (v pc env)
     (cond
       [(is-number? v)
        (check-number v pc env)]
@@ -201,7 +201,7 @@
 		  expression)))))
 
 (define check-label-lambda-expression
-  (trace-lambda label-lambda (begin-label params end-label body pc env)
+  (lambda (begin-label params end-label body pc env)
     (let ([b (eval begin-label)]
           [e (eval end-label)])
       (if (label-flows-to pc b)
@@ -498,21 +498,22 @@
                   (join-all-labels (cdr vs) pc env))])))
 
 (define check-application
-  (trace-lambda check-app (v vs pc env)
+  (lambda (v vs pc env)
     (let ([ret-label (check-expression v pc env)])
       (if (equal? 'predefined ret-label)
           (join-all-labels vs pc env)
-          (let ([end-label (lambda-label-end ret-label)])
-            (if (label-flows-to end-label pc)
+          (let ([end-label (lambda-label-end ret-label)]
+                [begin-label (lambda-label-begin ret-label)])
+            (if (label-flows-to pc begin-label)
                 (begin (check-expressions-with-label-list vs
                                                           (lambda-label-params ret-label)
                                                           pc
                                                           env)
                        end-label)
                 (errorf 'check-application
-                        "Mismatched return label in application with ~s -> ~s~nFor: ~s~n"
-                        end-label
+                        "pc more restrictive than begin label in application with ~s -> ~s~nFor: ~s~n"
                         pc
+                        begin-label
                         v)))))))
 
 (define check-expressions-with-label-list
