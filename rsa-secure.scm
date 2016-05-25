@@ -79,8 +79,11 @@
                                          (cdr key)))))
 
 (define decrypt
-  (lambda (m key)
-    (modulo_expt m (car key) (cdr key))))
+  (label-lambda '(label () ())
+                ([m '(label () (confidentiality . 0))]
+                 [key '(label () ())])
+                '(label () ())
+                (modulo_expt m (car key) (cdr key))))
 
 ;;; Test with large keys
 
