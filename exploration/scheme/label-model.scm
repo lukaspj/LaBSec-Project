@@ -175,9 +175,19 @@
   (list
    '(+ . predefined)
    '(- . predefined)
-   '(printf (lambda-label (label (integrity . 0) (confidentiality . 0))
-                          ([s (label (integrity . 0) (confidentiality . 0))])
-                          (label (integrity . 0) (confidentiality . 0))))
+   '(printf lambda-label (label () (confidentiality . 0))
+            ((label (integrity . 0) (confidentiality . 0))
+             (label (integrity . 0) (confidentiality . 0))
+             (label (integrity . 0) (confidentiality . 0))
+             (label (integrity . 0) (confidentiality . 0))
+             (label (integrity . 0) (confidentiality . 0))
+             (label (integrity . 0) (confidentiality . 0))
+             (label (integrity . 0) (confidentiality . 0))
+             (label (integrity . 0) (confidentiality . 0))
+             (label (integrity . 0) (confidentiality . 0))
+             (label (integrity . 0) (confidentiality . 0))
+             (label (integrity . 0) (confidentiality . 0)))
+            (label () (confidentiality . 0)))
    ))
 
 ;;;;;;;;;;;;;;;;;;;

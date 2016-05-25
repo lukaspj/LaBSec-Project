@@ -33,7 +33,8 @@
     "positive-tests/testCondSimple.scm"
     "positive-tests/testCondSimple2.scm"
     "positive-tests/testCase.scm"
-    "positive-tests/testCaseSimple.scm"))
+    "positive-tests/testCaseSimple.scm"
+    "positive-tests/testLambda.scm"))
 
 (define try
   (lambda (thunk)
