@@ -42,7 +42,7 @@
   (label-lambda '(label () (confidentiality . 0))
                 ([username '(label () (confidentiality . 0))]
                  [passwordhash '(label () (confidentiality . 3))])
-                '(label () ())
+                '(label () (confidentiality . 1))
                 '(auth 1002)))
 
 (define hash
