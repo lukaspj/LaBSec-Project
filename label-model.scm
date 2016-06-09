@@ -192,7 +192,7 @@
                 "Both labels is not value labels ~s, ~s~n"
                 l1 l2))))
 
-(define anything-flows-label
+(define flow-anywhere-label
   '(label () (confidentiality . 0)))
 
 (define make-lambda-label
