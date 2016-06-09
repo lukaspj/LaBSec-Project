@@ -492,7 +492,7 @@
   (lambda (vs pc env)
     (cond
      [(null? vs)
-      flow-anywhere-label]
+      anything-flows-label]
      [else
       (label-join (check-expression (car vs) pc env)
                   (join-all-labels (cdr vs) pc env))])))
