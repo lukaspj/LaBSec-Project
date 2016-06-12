@@ -175,17 +175,6 @@
      (lambda(v)
        pc))))
 
-(define check-variable*
-  (lambda (v pc env)
-    (cond
-     [(null? v)
-      pc]
-     [(pair? v) ;;TODO should be union
-      (check-variable (car v) pc env)
-      (check-variable* (cdr v) pc env)]
-     [else
-      (check-variable v pc env)])))
-
 ;;; IFC
 
 (define check-label-expression
