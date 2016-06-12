@@ -56,14 +56,14 @@
                 ([filename '(label (confidentiality . 0))]
                  [data '(label (confidentiality . 0))])
                 '(label (confidentiality . 0))
-                (declassify '(label (confidentiality . 0))
-                            (printf "~s: ~s ~n" filename data)))) ;; Fix need of declassify here
+                '(label (confidentiality . 0))
+                (printf "~s: ~s ~n" filename data))) ;; Fix need of declassify here
 
 (define fetch-data-from-web-page
   (label-lambda '(label (confidentiality . 0))
                 ([username '(label (confidentiality . 0))]
                  [password '(label)])
-                '(label (confidentiality . 1))
+                '(label (confidentiality . 0))
                 (store-data
                  "s-stuff.png"
                  (download-user-data
