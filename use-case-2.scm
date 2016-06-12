@@ -2,8 +2,8 @@
 (load "rsa-secure.scm")
 
 ;; Open-web-page -> hash(declassify) -> log-in -> download-data -> store-data
-;; 0 : alle (public)
-;; 1 : brugere
+;; 0 : all (public)
+;; 1 : users
 ;; 2 : mods
 ;; 3 : admins
 
@@ -17,7 +17,7 @@
 
 ;; (define download-data
 ;;   (lambda (file access-token)
-;;     "Some data array"))
+;;     1201203911239129812398123918239129812938129388124071274087019327859018273590132))
 
 ;; (define log-in
 ;;   (lambda (username passwordhash)
