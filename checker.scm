@@ -211,7 +211,7 @@
                                                                          pc
                                                                          env))])
             (if (label-flows-to ret-label e)
-                `(lambda-label ,b ,(params-to-label-list params) ,e)
+                (make-lambda-label b (params-to-label-list params) e)
                 (errorf 'check-label-lambda-expression
                         "Mismatched labels for ret-label and end-label~n~s -> ~s For expression: ~s~n"
                         ret-label
@@ -464,14 +464,14 @@
 
 (define check-lambda
   (lambda (formals expression pc env)
-    `(lambda-label ,pc
-                   ,(formals-to-list-of formals pc)
-                   ,(check-expression expression
-                                      pc
-                                      (check-lambda-formals
-                                       formals
-                                       pc
-                                       env)))))
+    (make-lambda-label pc
+                       (formals-to-list-of formals pc)
+                       (check-expression expression
+                                         pc
+                                         (check-lambda-formals
+                                          formals
+                                          pc
+                                          env)))))
 
 (define check-trace-lambda
   (lambda (name formals expression pc env)
@@ -492,7 +492,7 @@
   (lambda (vs pc env)
     (cond
      [(null? vs)
-      '(label () (confidentiality . 0))]
+      flow-anywhere-label]
      [else
       (label-join (check-expression (car vs) pc env)
                   (join-all-labels (cdr vs) pc env))])))

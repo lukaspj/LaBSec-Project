@@ -28,9 +28,14 @@
     (and (proper-list-of-given-length? v length)
          (equal? (car v) type))))
 
+(define is-given-variadic-type?
+  (lambda (v length type)
+    (and (proper-list-longer-than-given-length? v length)
+         (equal? (car v) type))))
+
 (define is-value-label?
   (lambda (v)
-    (is-given-type? v 3 'label)))
+    (is-given-variadic-type? v 1 'label)))
 
 (define is-lambda-label?
   (lambda (v)
@@ -97,6 +102,26 @@
         #t
         (and (check-label (car vs))
              (check-labels (cdr vs))))))
+
+(define get-label-attribute
+  (lambda (l a)
+    (cond
+     [(null? l)
+      '()]
+     [(and (pair? (car l))
+           (equal? (caar l) a))
+      (cdar l)]
+     [else
+      (get-label-attribute (cdr l) a)])))
+
+(define get-label-confidentiality
+  (lambda (l)
+    (get-label-attribute l 'confidentiality)))
+
+(define get-label-integrity
+  (lambda (l)
+    (get-label-attribute l 'integrity)))
+
 ;;;;;;;;;;;;
 ;;; Flows and joins
 ;;;;;;;;;;;;
@@ -104,44 +129,44 @@
 ;;; Centralized-One-dimensional label model
 (define check-integrity-flows-to
   (lambda (l1 l2)
-    (let ([integrity1 (cadr l1)]
-	  [integrity2 (cadr l2)])
+    (let ([integrity1 (get-label-integrity l1)]
+	  [integrity2 (get-label-integrity l2)])
       (if (null? integrity1)
 	  #t
 	  (and (not (null? integrity2))
-	       (>= (cdr integrity1) (cdr integrity2)))))))
+	       (>= integrity1 integrity2))))))
 
 (define check-confidentiality-flows-to
   (lambda (l1 l2)
-    (let ([confidentiality1 (caddr l1)]
-	  [confidentiality2 (caddr l2)])
+    (let ([confidentiality1 (get-label-confidentiality l1)]
+	  [confidentiality2 (get-label-confidentiality l2)])
       (if (null? confidentiality1)
 	  (null? confidentiality2)
 	  (or (null? confidentiality2)
-	      (<= (cdr confidentiality1) (cdr confidentiality2)))))))
+	      (<= confidentiality1 confidentiality2))))))
 
 (define join-integrity
   (lambda (l1 l2)
-    (let ([integrity1 (cadr l1)]
-	  [integrity2 (cadr l2)])
+    (let ([integrity1 (get-label-integrity l1)]
+	  [integrity2 (get-label-integrity l2)])
       (if (null? integrity1)
 	  (if (null? integrity2)
 	      '()
-	      integrity2)
+	      (cons 'integrity integrity2))
 	  (if (null? integrity2)
-	      integrity1
+	      (cons 'integrity integrity1)
 	      (cons 'integrity
-		    (min (cdr integrity1) (cdr integrity2))))))))
+		    (min integrity1 integrity2)))))))
   
 (define join-confidentiality
   (lambda (l1 l2)
-	  (let ([confidentiality1 (caddr l1)]
-		[confidentiality2 (caddr l2)])
+	  (let ([confidentiality1 (get-label-confidentiality l1)]
+		[confidentiality2 (get-label-confidentiality l2)])
 	    (if (or (null? confidentiality1)
 		    (null? confidentiality2))
 		'()
 		(cons 'confidentiality
-		      (max (cdr confidentiality1) (cdr confidentiality2)))))))
+		      (max confidentiality1 confidentiality2))))))
   
 (define label-join
   (lambda (l1 l2)
@@ -166,6 +191,15 @@
         (errorf 'label-flows-to
                 "Both labels is not value labels ~s, ~s~n"
                 l1 l2))))
+
+(define flow-anywhere-label
+  '(label () (confidentiality . 0)))
+
+(define make-lambda-label
+  (lambda (b formals e)
+    `(lambda-label ,b
+                   ,formals
+                   ,e)))
 
 ;;;;;;;;;;;;;;;;;;;
 ;;; Predifined env
@@ -309,4 +343,6 @@
   (and (test-join-equal 'toptop 'botbot 'bottop)
        (test-join-equal 'botbot 'toptop 'bottop)
        (test-join-equal 'topbot 'toptop 'toptop)
-       (test-join-equal 'topbot 'topbot 'topbot)))
+       (test-join-equal 'topbot 'topbot 'topbot)
+       (test-join-equal 'toptop ''(label) 'toptop)
+       (test-join-equal 'topbot ''(label (confidentiality . 0)) 'topbot)))
