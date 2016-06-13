@@ -464,9 +464,14 @@
 
 (define check-trace-lambda
   (lambda (name formals expression pc env)
-    (check-expression expression
-                      pc
-                      (check-lambda-formals formals pc env))))
+    (make-lambda-label pc
+                       (formals-to-list-of formals pc)
+                       (check-expression expression
+                                         pc
+                                         (check-lambda-formals
+                                          formals
+                                          pc
+                                          env)))))
 
 (define check-lambda-formals
   (lambda (v pc env)
